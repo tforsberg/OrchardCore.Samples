@@ -13,26 +13,13 @@ namespace Module1.Controllers
     [ApiController]
     public class PersonController : ControllerBase
     {
-        List<Person> _person = new List<Person>();
+        static List<Person> _person = new List<Person>() { 
+            new Person() { Id = 1, FirstName="Todd", LastName="Forsberg", IsActive=true},
+            new Person() { Id = 2, FirstName="John", LastName="Doe", IsActive=true}
+        };
 
         public PersonController()
         {
-            // Sample Data //
-            var a = new Person();
-            a.Id = 1;
-            a.FirstName = "Todd";
-            a.LastName = "Forsberg";
-            a.IsActive = true;
-
-            var b = new Person();
-            b.Id = 2;
-            b.FirstName = "John";
-            b.LastName = "Doe";
-            b.IsActive = true;
-
-            _person.Add(a);
-            _person.Add(b);
-
         }
 
         // GET: api/<PersonController>
@@ -61,6 +48,7 @@ namespace Module1.Controllers
 
         // POST api/<PersonController>      // This method is not working //
         [HttpPost]
+        [IgnoreAntiforgeryToken]
         public void Post([FromBody] Person person)
         {
             _person.Add(person);
@@ -68,14 +56,26 @@ namespace Module1.Controllers
 
         // PUT api/<PersonController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [IgnoreAntiforgeryToken]
+        public void Put(int id, [FromBody] Person value)
         {
+            var person = _person.SingleOrDefault(p => p.Id == id);
+            if (person != null)
+            {
+                person.FirstName = value.FirstName;
+                person.LastName = value.LastName;
+                person.IsActive = value.IsActive;
+            }
         }
 
         // DELETE api/<PersonController>/5
         [HttpDelete("{id}")]
+        [IgnoreAntiforgeryToken]
         public void Delete(int id)
         {
+            var person = _person.SingleOrDefault(p => p.Id == id);
+            if (person != null)
+                _person.Remove(person);
         }
     }
 }
